@@ -1,0 +1,3 @@
+# JavaSample
+
+hello world
