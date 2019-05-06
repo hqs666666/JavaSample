@@ -1,10 +1,9 @@
-package example.controller;
+package pub.hqs.controller;
 
-import example.pojo.User;
-import example.pojo.PagedList;
-import example.pojo.UserSearch;
-import example.service.IUserService;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.github.pagehelper.PageInfo;
+import pub.hqs.pojo.User;
+import pub.hqs.pojo.UserSearch;
+import pub.hqs.service.users.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,7 +11,6 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.io.IOException;
 
 @Controller
 @RequestMapping("/user")
@@ -22,8 +20,8 @@ public class UserController {
 
     @RequestMapping("/index")
     public String Index(Model model, UserSearch search) {
-        PagedList<User> users = userService.findAll(search);
-        model.addAttribute("users", users);
+        PageInfo<User> pageInfo = userService.getUserList(search);
+        model.addAttribute("pageInfo", pageInfo);
         return "user_index";
     }
 
@@ -59,10 +57,8 @@ public class UserController {
 
     @RequestMapping("/json")
     @ResponseBody
-    public String Json() throws IOException {
+    public User Json() {
         User user = userService.getById(1);
-        ObjectMapper mapper = new ObjectMapper();
-        String str = mapper.writeValueAsString(user);
-        return str;
+        return user;
     }
 }

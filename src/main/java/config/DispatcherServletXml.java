@@ -3,19 +3,27 @@ package config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.format.FormatterRegistry;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+import org.springframework.web.servlet.HandlerAdapter;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Configuration
 @EnableWebMvc
 /*<context:component-scan base-package="example.controller"/>*/
-@ComponentScan("example.controller")
+@ComponentScan(value = "pub.hqs.controller", includeFilters = {@ComponentScan.Filter(type = FilterType.ANNOTATION, value = Controller.class)})
 public class DispatcherServletXml extends WebMvcConfigurerAdapter {
 
     /*
@@ -48,20 +56,25 @@ public class DispatcherServletXml extends WebMvcConfigurerAdapter {
         resolver.setMaxUploadSize(2000000);
         return resolver;
     }
-
-    @Override
-    public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer){
-        configurer.enable();
-        super.configureDefaultServletHandling(configurer);
+    /**
+    * 初始化 RequestMappingHandleAdapter 并加载Http的Json转换器
+    * @Param:
+    * @return:
+    * @Author: hqs.pub
+    * @Date: 2019/5/4
+    */
+    @Bean(name = "requestMappingHandlerAdapter")
+    public HandlerAdapter initRequestMappingHandlerAdapter(){
+        RequestMappingHandlerAdapter adapter = new RequestMappingHandlerAdapter();
+        MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
+        MediaType mediaType = MediaType.APPLICATION_JSON_UTF8;
+        List<MediaType> mediaTypes = new ArrayList<>();
+        mediaTypes.add(mediaType);
+        jsonConverter.setSupportedMediaTypes(mediaTypes);
+        adapter.getMessageConverters().add(jsonConverter);
+        return adapter;
     }
 
-    /*
-    <mvc:annotation-driven />
-     静态资源配置
-    <mvc:resources mapping="/css/**" location="/WEB-INF/statics/css/"/>
-    <mvc:resources mapping="/js/**" location="/WEB-INF/statics/js/"/>
-    <mvc:resources mapping="/image/**" location="/WEB-INF/statics/image/"/>
-     */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry){
         registry.addResourceHandler("/css/**").addResourceLocations("/WEB-INF/statics/css/");
@@ -71,20 +84,15 @@ public class DispatcherServletXml extends WebMvcConfigurerAdapter {
         super.addResourceHandlers(registry);
     }
 
-    /*
-    //Formatter String -> Date
-     <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
-        <property name="formatters">
-            <set>
-                <bean class="formatter.LocalDateFormatter">
-                    <constructor-tag type="java.lang.String" value="yyyy-MM-dd hh:mm:dd" />
-                </bean>
-            </set>
-        </property>
-     </bean>
-    */
+    /**
+     * 配置静态资源的处理
+     * 要求DispatcherServlet将对静态资源的请求转发到Servlet容器中默认的Servlet上
+     * 而不是使用DispatcherServlet本身来处理此类请求。
+     *
+     * @param configurer
+     */
     @Override
-    public void addFormatters(FormatterRegistry registry) {
-        super.addFormatters(registry);
+    public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
+        configurer.enable();
     }
 }

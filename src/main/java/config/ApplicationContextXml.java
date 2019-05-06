@@ -1,41 +1,121 @@
 package config;
 
+import com.github.pagehelper.PageInterceptor;
+import org.apache.commons.dbcp.BasicDataSourceFactory;
+import org.apache.ibatis.plugin.Interceptor;
+import org.mybatis.spring.SqlSessionFactoryBean;
+import org.mybatis.spring.mapper.MapperScannerConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.transaction.annotation.TransactionManagementConfigurer;
 
 import javax.sql.DataSource;
-import javax.xml.ws.Service;
+import java.io.FileReader;
 import java.util.Properties;
 
 @Configuration
-/*@ComponentScan(basePackages = {"example"}, includeFilters = {@ComponentScan.Filter(type = FilterType.ANNOTATION, value = {Service.class})})*/
-@ComponentScan(basePackages = {"example"}, excludeFilters = {@ComponentScan.Filter(type = FilterType.ANNOTATION,value = EnableWebMvc.class)})
-/*@EnableTransactionManagement*/
-public class ApplicationContextXml {
+@ComponentScan(value = {"pub.hqs.service","pub.hqs.dao"}, includeFilters = {@ComponentScan.Filter(type = FilterType.ANNOTATION, value = {Service.class})})
+@EnableTransactionManagement
+public class ApplicationContextXml implements TransactionManagementConfigurer {
     private DataSource dataSource = null;
 
+    /**
+     * 配置数据库
+    * */
     @Bean(name = "dataSource")
     public DataSource initDataSource() {
         if (dataSource != null)
             return dataSource;
 
-        Properties props = new Properties();
-        props.setProperty("driverClassName", "com.sql.jdbc.Driver");
-        props.setProperty("url", "jdbc:mysql://t.cn/ssm?useUnicode=true&characterEncoding=utf8");
-        props.setProperty("username", "root");
-        props.setProperty("password", "123456");
-        props.setProperty("maxActive", "200");   //最大连接数
-        props.setProperty("maxIdle", "20");      //最大
-        props.setProperty("maxWait", "30000");   //最大等待
+        Properties props = getProperties("jdbc.properties");
         try {
-
-        } catch (Exception ex) {
+            dataSource = BasicDataSourceFactory.createDataSource(props);
+        }
+        catch (Exception ex) {
             ex.printStackTrace();
         }
         return dataSource;
+    }
+
+    /**
+     *配置 SqlSessionFactoryBean
+     */
+    @Bean(name = "sqlSessionFactory")
+    public SqlSessionFactoryBean initSqlSessionFactory(){
+        SqlSessionFactoryBean sqlSessionFactory = new SqlSessionFactoryBean();
+        sqlSessionFactory.setDataSource(initDataSource());
+        //读取classpath下的资源文件
+        Resource resource = new ClassPathResource("mybatis-config.xml");
+        sqlSessionFactory.setConfigLocation(resource);
+        sqlSessionFactory.setPlugins(new Interceptor[]{initPageInterceptor()});
+        return sqlSessionFactory;
+    }
+
+    /**
+    *通过自动扫描，发现mapper 接口
+     * */
+    @Bean()
+    public MapperScannerConfigurer initMapperScannerConfigurer(){
+        MapperScannerConfigurer msc = new MapperScannerConfigurer();
+        msc.setBasePackage("pub.hqs.*");
+        msc.setSqlSessionFactoryBeanName("sqlSessionFactory");
+        msc.setAnnotationClass(Repository.class);
+        return msc;
+    }
+
+    /** 
+    * 实现接口方法，注册注解事物，当@Transactional使用时产生数据库事物
+    * @Param:
+    * @return:  PlatformTransactionManager
+    * @Author: hqs.pub
+    * @Date: 2019/5/4 
+    */
+    @Override
+    @Bean(name="annotationDrivenTransactionManager")
+    public PlatformTransactionManager annotationDrivenTransactionManager(){
+        DataSourceTransactionManager transactionManager = new DataSourceTransactionManager();
+        transactionManager.setDataSource(initDataSource());
+        return transactionManager;
+    }
+
+    /** 
+    * 初始化分页插件 
+    * @Param:
+    * @return:
+    * @Author: hqs.pub
+    * @Date: 2019/5/4 
+    */ 
+    public PageInterceptor initPageInterceptor(){
+        PageInterceptor pageInterceptor = new PageInterceptor();
+        Properties props = getProperties("page.properties");
+        pageInterceptor.setProperties(props);
+        return pageInterceptor;
+    }
+
+    /**
+    * 获取classpath下的文件内容
+    * @Param: filename classpath下的文件路径
+    * @return:
+    * @Author: hqs.pub
+    * @Date: 2019/5/4
+    */
+    private Properties getProperties(String filename){
+        Properties props = new Properties();
+        try{
+            Resource resource = new ClassPathResource(filename);
+            props.load(new FileReader(resource.getFile()));
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+        return props;
     }
 }

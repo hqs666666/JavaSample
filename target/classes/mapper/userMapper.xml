@@ -4,9 +4,9 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <!--映射文件的根节点namespace-->
-<mapper namespace="example.dao.IUserRepository">
+<mapper namespace="pub.hqs.dao.users.IUserRepository">
     <!--<cache /> 缓存，要求pojo必须实现序列化-->
-    <resultMap id="userMap" type="example.pojo.User">
+    <resultMap id="userMap" type="pub.hqs.pojo.User">
         <id property="id" column="id"/>
         <result property="name" column="name"/>
         <result property="nickname" column="nickname"/>
@@ -21,10 +21,10 @@
     <select id="getById" resultMap="userMap" parameterType="java.lang.Integer">
         select * from user where id=#{id}
     </select>
-    <insert id="insertUser" parameterType="example.pojo.User" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertUser" parameterType="pub.hqs.pojo.User" useGeneratedKeys="true" keyProperty="id">
         insert into user(id,name,nickname,gender,password) values(#{id},#{name},#{nickname},#{gender},#{password})
     </insert>
-    <update id="updateUser" parameterType="example.pojo.User">
+    <update id="updateUser" parameterType="pub.hqs.pojo.User">
         update user
         <set>
             <if test="name != null and name != ''">

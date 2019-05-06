@@ -3,8 +3,10 @@ package config;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
+import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRegistration.*;
 
 public class WebXml extends AbstractAnnotationConfigDispatcherServletInitializer {
 
@@ -19,8 +21,8 @@ public class WebXml extends AbstractAnnotationConfigDispatcherServletInitializer
       */
 
     @Override
-    protected Class<?>[] getRootConfigClasses(){
-        return new Class<?>[] {ApplicationContextXml.class};
+    protected Class<?>[] getRootConfigClasses() {
+        return new Class<?>[]{ApplicationContextXml.class};
     }
 
     /*
@@ -39,8 +41,8 @@ public class WebXml extends AbstractAnnotationConfigDispatcherServletInitializer
 
     @Override
 
-    protected Class<?>[] getServletConfigClasses(){
-        return new Class<?>[] {DispatcherServletXml.class};
+    protected Class<?>[] getServletConfigClasses() {
+        return new Class<?>[]{DispatcherServletXml.class};
     }
 
     /*
@@ -51,8 +53,19 @@ public class WebXml extends AbstractAnnotationConfigDispatcherServletInitializer
      */
 
     @Override
-    protected String[] getServletMappings(){
-        return new String[] {"/"};
+    protected String[] getServletMappings() {
+        return new String[]{"/"};
+    }
+
+    @Override
+    protected void customizeRegistration(Dynamic dynamic) {
+        //配置文件上传路径
+        String filePath = "";
+        //5M
+        long singleMax = (long) (5 * Math.pow(2, 20));
+        //10M
+        long totalMax = (long) (10 * Math.pow(2, 20));
+        dynamic.setMultipartConfig(new MultipartConfigElement(filePath, singleMax, totalMax, 0));
     }
 
     /*
@@ -73,10 +86,10 @@ public class WebXml extends AbstractAnnotationConfigDispatcherServletInitializer
 
     /*初始化器*/
     @Override
-    public void onStartup(ServletContext servletContext) throws ServletException{
+    public void onStartup(ServletContext servletContext) throws ServletException {
         super.onStartup(servletContext);
-        servletContext.addFilter("name",new CharacterEncodingFilter("UTF-8",true))
-                .addMappingForUrlPatterns(null,false,"/*");
+        servletContext.addFilter("name", new CharacterEncodingFilter("UTF-8", true))
+                .addMappingForUrlPatterns(null, false, "/*");
     }
 }
 

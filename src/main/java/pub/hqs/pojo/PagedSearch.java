@@ -1,4 +1,4 @@
-package example.pojo;
+package pub.hqs.pojo;
 
 import java.io.Serializable;
 
@@ -7,8 +7,11 @@ public abstract class PagedSearch  implements Serializable {
     private int pagesize;
     private int offset;
 
-    public PagedSearch(int page, int pagesize) {
+    public void setPage(int page) {
         this.page = page;
+    }
+
+    public void setPagesize(int pagesize) {
         this.pagesize = pagesize;
     }
 
@@ -23,5 +26,9 @@ public abstract class PagedSearch  implements Serializable {
 
     public int getPagesize() {
         return pagesize;
+    }
+
+    public int getPage() {
+        return page;
     }
 }

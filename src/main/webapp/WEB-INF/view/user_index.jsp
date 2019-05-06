@@ -30,7 +30,7 @@
             </tr>
             </thead>
             <tbody>
-            <c:forEach items="${users.items}" var="item">
+            <c:forEach items="${pageInfo.list}" var="item">
                 <tr>
                     <td>
                         <a href="<c:url value="/user/detail?id=${item.id}"/>">${item.id}</a>
@@ -47,21 +47,39 @@
             </tbody>
         </table>
         <c:choose>
-            <c:when test="${users.total > 10}">
-                <nav aria-label="Page navigation">
+            <c:when test="${pageInfo.pages > 1}">
+                <nav aria-label="Page navigation" class="text-center">
                     <ul class="pagination">
-                        <li>
-                            <a href="#" aria-label="Previous">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
-                        <li><a href="#">1</a></li>
-                        <li><a href="#">2</a></li>
-                        <li>
-                            <a href="#" aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        </li>
+                        <c:choose>
+                            <c:when test="${pageInfo.hasPreviousPage}">
+                                <li>
+                                    <a href="<c:url value="/user/index?page=${pageInfo.pageNum-1}"/>" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            </c:when>
+                        </c:choose>
+                       <c:forEach items="${pageInfo.navigatepageNums}" var="page">
+                               <c:if test="${pageInfo.pageNum == page}">
+                                   <li class="active">
+                                       <span>${page}</span>
+                                   </li>
+                               </c:if>
+                               <c:if test="${pageInfo.pageNum != page}">
+                                   <li>
+                                       <a c href="<c:url value="/user/index?page=${page}"/>">${page}</a>
+                                   </li>
+                               </c:if>
+                       </c:forEach>
+                        <c:choose>
+                            <c:when test="${pageInfo.hasNextPage}">
+                                <li>
+                                    <a href="<c:url value="/user/index?page=${pageInfo.pageNum+1}"/>" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            </c:when>
+                        </c:choose>
                     </ul>
                 </nav>
             </c:when>

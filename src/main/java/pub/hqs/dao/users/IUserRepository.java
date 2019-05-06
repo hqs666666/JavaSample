@@ -1,14 +1,13 @@
-package example.dao;
+package pub.hqs.dao.users;
 
-import example.pojo.User;
-import org.apache.ibatis.session.RowBounds;
+import pub.hqs.pojo.User;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
 public interface IUserRepository {
-    List<User> findAll(RowBounds rowBounds);
+    List<User> findAll();
     User getById(int id);
     int insertUser(User user);
     int updateUser(User user);

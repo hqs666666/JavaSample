@@ -1,4 +1,4 @@
-package example.pojo;
+package pub.hqs.pojo;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
