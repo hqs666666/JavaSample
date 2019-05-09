@@ -21,7 +21,7 @@ public class UserService extends BaseService implements IUserService {
     @Override
     public PageInfo<User> getUserList(UserSearch search){
         PageHelper.startPage(search.getPage(),search.getPagesize());
-        List<User> users = userRepository.findAll();
+        List<User> users = userRepository.findAll(search);
         PageInfo<User> pageInfo = new PageInfo<>(users);
         return pageInfo;
     }

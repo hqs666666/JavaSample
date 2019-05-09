@@ -22,6 +22,7 @@ public class UserController {
     public String Index(Model model, UserSearch search) {
         PageInfo<User> pageInfo = userService.getUserList(search);
         model.addAttribute("pageInfo", pageInfo);
+        model.addAttribute("search",search);
         return "user_index";
     }
 
