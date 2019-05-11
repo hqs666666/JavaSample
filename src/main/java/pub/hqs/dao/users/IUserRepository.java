@@ -1,8 +1,8 @@
 package pub.hqs.dao.users;
 
-import pub.hqs.pojo.User;
+import pub.hqs.pojo.users.User;
 import org.springframework.stereotype.Repository;
-import pub.hqs.pojo.UserSearch;
+import pub.hqs.pojo.users.UserSearch;
 
 import java.util.List;
 

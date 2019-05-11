@@ -1,4 +1,6 @@
-package pub.hqs.pojo;
+package pub.hqs.pojo.users;
+
+import pub.hqs.pojo.PagedSearch;
 
 import java.io.Serializable;
 

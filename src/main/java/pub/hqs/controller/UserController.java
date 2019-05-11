@@ -1,8 +1,10 @@
 package pub.hqs.controller;
 
 import com.github.pagehelper.PageInfo;
-import pub.hqs.pojo.User;
-import pub.hqs.pojo.UserSearch;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import pub.hqs.pojo.users.User;
+import pub.hqs.pojo.users.UserSearch;
 import pub.hqs.service.users.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,8 +20,11 @@ public class UserController {
     @Autowired
     private IUserService userService;
 
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+
     @RequestMapping("/index")
     public String Index(Model model, UserSearch search) {
+        logger.debug("1231231");
         PageInfo<User> pageInfo = userService.getUserList(search);
         model.addAttribute("pageInfo", pageInfo);
         model.addAttribute("search",search);
@@ -46,13 +51,13 @@ public class UserController {
             return "user_add";
         }
 
-        int result = userService.addOrUpdateUser(user);
+        userService.addOrUpdateUser(user);
         return "redirect:/user/index";
     }
 
     @RequestMapping("/delete/{id}")
     public String Delete(@PathVariable int id) {
-        int result = userService.deleteUser(id);
+        userService.deleteUser(id);
         return "redirect:/user/index";
     }
 

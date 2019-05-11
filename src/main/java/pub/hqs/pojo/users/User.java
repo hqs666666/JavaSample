@@ -1,4 +1,4 @@
-package pub.hqs.pojo;
+package pub.hqs.pojo.users;
 
 import javax.validation.constraints.NotBlank;
 import org.hibernate.validator.constraints.Range;

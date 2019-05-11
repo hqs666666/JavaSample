@@ -1,4 +1,4 @@
-package pub.hqs.pojo;
+package pub.hqs.pojo.users;
 
 import org.springframework.format.annotation.DateTimeFormat;
 

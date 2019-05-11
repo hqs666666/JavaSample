@@ -1,8 +1,8 @@
 package pub.hqs.service.users;
 
 import com.github.pagehelper.PageInfo;
-import pub.hqs.pojo.User;
-import pub.hqs.pojo.UserSearch;
+import pub.hqs.pojo.users.User;
+import pub.hqs.pojo.users.UserSearch;
 
 public interface IUserService {
     PageInfo<User> getUserList(UserSearch search);

@@ -17,6 +17,14 @@
 
     <select id="findAll" resultMap="userMap">
         select * from user
+        <where>
+            <if test="name != null and name != ''">
+                name like concat('%',#{name},'%')
+            </if>
+            <if test="nickname != null and nickname != ''">
+                and nickname like concat('%',#{nickname},'%')
+            </if>
+        </where>
     </select>
     <select id="getById" resultMap="userMap" parameterType="java.lang.Integer">
         select * from user where id=#{id}
